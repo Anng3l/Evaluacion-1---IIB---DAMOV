@@ -336,7 +336,7 @@ class _UsersPageState extends State<UsersPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Lugar turístico guardado exitosamente.'),
+          content: Text('Tarea guardada exitosamente.'),
           backgroundColor: Color(0xFF16243e), // Azul institucional
           behavior: SnackBarBehavior.floating,
         ),
@@ -385,87 +385,7 @@ class _UsersPageState extends State<UsersPage> {
   }
 
 
-/*
-  void _mostrarModalImagen(String url, String lugarId, bool esAutor) async {
 
-
-
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                child: InteractiveViewer(
-                  minScale: 1,
-                  maxScale: 4,
-                  child: Image.network(url, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 12),
-              
-              !esAutor ? 
-              Text("")
-              :
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _confirmarEliminarImagen(lugarId, url);
-                    },
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                    label: const Text('Eliminar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE72F2B),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      await _actualizarImagen(lugarId, url);
-                    },
-                    icon: const Icon(Icons.image_search, color: Colors.white),
-                    label: const Text('Actualizar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF16243e),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-      ),
-    );
-  }*/
 
   Future<bool> _confirmarGuardarLugar() async {
     return await showDialog<bool>(
@@ -628,312 +548,13 @@ class _UsersPageState extends State<UsersPage> {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Lugar eliminado exitosamente.'),
+          content: Text('Tarea eliminada exitosamente.'),
           backgroundColor: Color(0xFF16243e), // Azul institucional
           behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
-
-
-/*
-  Future<bool> _confirmarEliminarImagen(String lugarId, String url) async {
-    final confirmado = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Eliminar Imagen',
-          style: TextStyle(
-            color: Color(0xFFE72F2B),
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        content: const Text(
-          '¿Deseas eliminar esta imagen?',
-          style: TextStyle(fontSize: 16, color: Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.grey.shade300,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Color(0xFFE72F2B),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sí, eliminar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmado == true) {
-      // Mostrar spinner
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF8AD25)),
-          ),
-        ),
-      );
-
-      try {
-        final doc = FirebaseFirestore.instance
-            .collection('evaluacion')
-            .doc(lugarId);
-        await doc.update({
-          'fotografias': FieldValue.arrayRemove([url]),
-        });
-
-        Navigator.pop(context); // Cierra el spinner
-        return true;
-      } catch (e) {
-        Navigator.pop(context); // Cierra el spinner
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar la imagen: $e')),
-        );
-      }
-    }
-
-    return false;
-  }
-
-  Future<void> _agregarMasImagenes(String lugarId, int cantidadActual) async {
-    final ImageSource? origen = await showModalBottomSheet<ImageSource?>(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text('Tomar foto'),
-            onTap: () => Navigator.pop(context, ImageSource.camera),
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_library),
-            title: const Text('Seleccionar de galería'),
-            onTap: () => Navigator.pop(context, ImageSource.gallery),
-          ),
-        ],
-      ),
-    );
-
-    if (origen == null) return;
-
-    final int cantidadDisponible = 6 - cantidadActual;
-    final storage = Supabase.instance.client.storage.from('turismo');
-    final nuevasUrls = <String>[];
-
-    try {
-      if (origen == ImageSource.camera) {
-        final pickedFile = await picker.pickImage(
-          source: ImageSource.camera,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 100,
-        );
-
-        if (pickedFile != null) {
-          if (cantidadDisponible < 1) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Ya tienes 6 imágenes.'),
-                backgroundColor: Color(0xFF16243e), // Azul institucional
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-            return;
-          }
-
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) => const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF8AD25)),
-              ),
-            ),
-          );
-
-          final bytes = await pickedFile.readAsBytes();
-          final fileName = 'img_${uuid.v4()}.jpg';
-          final path = await storage.uploadBinary(
-            fileName,
-            bytes,
-            fileOptions: const FileOptions(contentType: 'image/jpeg'),
-          );
-
-          if (path.isNotEmpty) {
-            final url = storage.getPublicUrl(fileName);
-            nuevasUrls.add(url);
-          }
-
-          Navigator.pop(context);
-        }
-      } else if (origen == ImageSource.gallery) {
-        final pickedFiles = await picker.pickMultiImage(
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 100,
-        );
-
-        if (pickedFiles.isEmpty) return;
-
-        if (pickedFiles.length > cantidadDisponible) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Solo puedes agregar $cantidadDisponible imágenes.',
-              ),
-            ),
-          );
-          return;
-        }
-
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF8AD25)),
-            ),
-          ),
-        );
-
-        for (var pickedFile in pickedFiles) {
-          final bytes = await pickedFile.readAsBytes();
-          final fileName = 'img_${uuid.v4()}.jpg';
-
-          final path = await storage.uploadBinary(
-            fileName,
-            bytes,
-            fileOptions: const FileOptions(contentType: 'image/jpeg'),
-          );
-
-          if (path.isNotEmpty) {
-            final url = storage.getPublicUrl(fileName);
-            nuevasUrls.add(url);
-          }
-        }
-
-        Navigator.pop(context);
-      }
-
-      if (nuevasUrls.isNotEmpty) {
-        final doc = FirebaseFirestore.instance
-            .collection('evaluacion')
-            .doc(lugarId);
-        await doc.update({'fotografias': FieldValue.arrayUnion(nuevasUrls)});
-      }
-    } catch (e) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al subir imágenes: $e')));
-    }
-  }
-
-  Future<void> _actualizarImagen(String lugarId, String urlAntiguo) async {
-    final origen = await showModalBottomSheet<ImageSource?>(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.camera),
-            title: const Text('Tomar foto'),
-            onTap: () => Navigator.pop(context, ImageSource.camera),
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo),
-            title: const Text('Seleccionar de galería'),
-            onTap: () => Navigator.pop(context, ImageSource.gallery),
-          ),
-        ],
-      ),
-    );
-
-    if (origen == null) return;
-
-    final pickedFile = await picker.pickImage(source: origen);
-    if (pickedFile == null) return;
-
-    // Mostrar spinner
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF8AD25)),
-        ),
-      ),
-    );
-
-    try {
-      final nuevoBytes = await pickedFile.readAsBytes();
-      final storage = Supabase.instance.client.storage.from('turismo');
-      final nuevoNombre = 'img_${uuid.v4()}.jpg';
-
-      final nuevoPath = await storage.uploadBinary(
-        nuevoNombre,
-        nuevoBytes,
-        fileOptions: const FileOptions(contentType: 'image/jpeg'),
-      );
-
-      if (nuevoPath.isNotEmpty) {
-        final nuevaUrl = storage.getPublicUrl(nuevoNombre);
-        final doc = FirebaseFirestore.instance
-            .collection('evaluacion')
-            .doc(lugarId);
-
-        // Reemplaza la imagen antigua por la nueva
-        await doc.update({
-          'fotografias': FieldValue.arrayRemove([urlAntiguo]),
-        });
-
-        await doc.update({
-          'fotografias': FieldValue.arrayUnion([nuevaUrl]),
-        });
-      }
-
-      Navigator.pop(context); // Cierra el spinner
-      // No cierres el modal de imagen aquí, déjalo al botón si es necesario
-    } catch (e) {
-      Navigator.pop(context); // Cierra el spinner
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al actualizar la imagen: $e')),
-      );
-    }
-  }*/
-
 
 
 
@@ -963,7 +584,7 @@ class _UsersPageState extends State<UsersPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _styledField(nombreCtrl, 'Nombre del Lugar'),
+                  _styledField(nombreCtrl, 'Nombre de la tarea'),
                   const SizedBox(height: 10),
                   _styledField(descripcionCtrl, 'Descripción', maxLines: 2),
                   
@@ -1107,7 +728,7 @@ class _UsersPageState extends State<UsersPage> {
                     ),
                   ),
                   content: const Text(
-                    '¿Estás seguro de actualizar este lugar turístico?',
+                    '¿Estás seguro de actualizar esta tarea?',
                     style: TextStyle(fontSize: 16),
                   ),
                   actions: [
@@ -1164,7 +785,7 @@ class _UsersPageState extends State<UsersPage> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Lugar actualizado exitosamente.'),
+                    content: Text('Tarea actualizada exitosamente.'),
                     backgroundColor: Color(0xFF16243e), // Azul institucional
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -1408,7 +1029,7 @@ class _UsersPageState extends State<UsersPage> {
                     ElevatedButton.icon(
                       onPressed: () => _guardarTarea(context),
                       icon: const Icon(Icons.save),
-                      label: const Text('Guardar Lugar'),
+                      label: const Text('Añadir Tarea'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF16243e),
                         foregroundColor: Colors.white,
@@ -1436,6 +1057,7 @@ class _UsersPageState extends State<UsersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 22, 36, 62),
         foregroundColor: Colors.white,
@@ -1469,7 +1091,7 @@ class _UsersPageState extends State<UsersPage> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('evaluacion')
-                    .orderBy('fecha', descending: true)
+                    .where('tipo', isEqualTo: 'Publico')
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -1650,7 +1272,7 @@ class _UsersPageState extends State<UsersPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF16243e),
         foregroundColor: Colors.white, // Ícono blanco
-        tooltip: 'Añadir lugar turístico',
+        tooltip: 'Añadir tarea',
         onPressed: () => _mostrarFormularioModal(context),
         child: const Icon(Icons.add),
       ),
